@@ -12,8 +12,23 @@ function miniExpress() {
 
     const server = http.createServer((request, response) => {
         request.query = qs.parse(url.parse(request.url).query)
-        routes[request.method][request.url](request, response);
-        response.end();
+        const pathname = url.parse(request.url).pathname;
+
+        if (routes[request.method][pathname]) {
+            routes[request.method][pathname](request, response);
+        } else {
+            response.writeHead(404, {
+                'Content-Type' : 'text/html'
+            })
+
+            response.write(
+                `
+                <html>
+                    <body> NOT FOUND </body>
+                <html>
+                `
+            )
+        }
     })
 
     server.get = (url, handler) => {
@@ -23,6 +38,8 @@ function miniExpress() {
     server.post = (url, handler) => {
         routes['POST'][url] = handler
     }
+
+    return server;
 }
 
-export default server;
+export default miniExpress;
