@@ -23,17 +23,22 @@ pool.connect((error, client) => {
 
 
 app.get('/', (request, response) => {
-    db.query('SELECT * FROM organization', (error, results) => {
+    db.query(`select o."org_name", COUNT(*)
+        from organization as o
+        LEFT JOIN memberships as m on o."org_id" = m."org_id"
+        group by org_name;`, (error, results) => {
         if (error) {
             response.writeHead(500);
             response.end('SOMETHING WENT WRONG:' + error)
         } else {
 
-            const { rows : students } = results;
+            const { rows : organizations } = results;
             let textHtml = '';
-            for (const student of students) {
+            for (const organization of organizations) {
                 textHtml += ` 
-                <div> ${student.org_name}  </div> 
+                <div> ${organization.org_name} 
+                <i><small> (${organization.count}) </small></i>
+                </div> 
                 `
              }
 
@@ -75,7 +80,9 @@ app.get('/', (request, response) => {
                             </style>
                     </head>
                     <body>
-                        <h1> THESE ARE THE ORGANIZATION </h1>
+                        <a href="/">PAGE 1</a>
+                        <a href="/page2">PAGE 2</a>
+                        <h1> THESE ARE THE ORGANIZATIONS </h1>
                        ${textHtml} 
                     </body>
                 </html>
@@ -89,7 +96,15 @@ app.get('/', (request, response) => {
 
 
 app.get('/page2', (request, response) => {
-    db.query('SELECT * FROM organization', (error, results) => {
+    db.query(`
+    SELECT o."org_name" , s."first_name" , s."last_name" , p."ap_name"
+    from memberships as m
+    inner join organization as o on m.org_id = o.org_id
+    inner join students as s on m.student_id = s.student_id
+    inner join academicprograms as p on s.ap_id = p.ap_id
+    ;
+    
+    `, (error, results) => {
         if (error) {
             response.writeHead(500);
             response.end('SOMETHING WENT WRONG:' + error)
@@ -99,7 +114,7 @@ app.get('/page2', (request, response) => {
             let textHtml = '';
             for (const student of students) {
                 textHtml += ` 
-                <div> ${student.org_name}  </div> 
+                <div> ${student.org_name} , ${student.first_name} ${student.last_name} | ${student.ap_name}  </div> 
                 `
              }
 
@@ -112,6 +127,7 @@ app.get('/page2', (request, response) => {
                 `
                 <html>
                     <head>
+                    <link rel="stylesheet" href="style.css">
                         <title>Document</title>
                         <style>
                             body {
@@ -129,7 +145,7 @@ app.get('/page2', (request, response) => {
                             div {
                                 border: 2px solid blue;
                                 border-radius: 25px;
-                                font-size: 16px;
+                                font-size: 12px;
                                 margin-left:60px;
                                 margin-right:60px;
                                 margin-bottom:5px;
@@ -141,7 +157,9 @@ app.get('/page2', (request, response) => {
                             </style>
                     </head>
                     <body>
-                        <h1> THESE ARE THE ORGANIZATION </h1>
+                        <a href="/">PAGE 1</a>
+                        <a href="/page2">PAGE 2</a>
+                        <h1> ORG AND MEMBERS </h1>
                        ${textHtml} 
                     </body>
                 </html>

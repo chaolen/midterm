@@ -1,0 +1,65 @@
+
+exports.seed = function(knex) {
+  // Deletes ALL existing entries
+  return knex.raw(
+    `
+      INSERT INTO memberships
+      VALUES 
+      (
+        DEFAULT,
+        1,
+        7
+      ),
+      (
+        DEFAULT,
+        2,
+        3
+      ),
+      (
+        DEFAULT,
+        3,
+        2
+      ),
+      (
+        DEFAULT,
+        4,
+        5
+      ),
+      (
+        DEFAULT,
+        5,
+        4
+      ),
+      (
+        DEFAULT,
+        6,
+        2
+      ),
+      (
+        DEFAULT,
+        7,
+        1
+      ),
+      (
+        DEFAULT,
+        1,
+        10
+      ),
+      (
+        DEFAULT,
+        2,
+        11
+      ),
+      (
+        DEFAULT,
+        5,
+        8
+      ),
+      (
+        DEFAULT,
+        7,
+        9
+      )
+    `
+  )
+};
